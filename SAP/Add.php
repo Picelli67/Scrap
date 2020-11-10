@@ -166,5 +166,5 @@
         </form> 
 <?php
     $db = desconectar();
- 	include(FOOTER);
+ 	include(FOOTER_COMPLETE);
 ?>

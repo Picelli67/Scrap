@@ -30,7 +30,7 @@
             <div class="form-row">
                 <div class="form-group col-lg-3">
                     <label for="mat_sap">Material Number</label>
-                    <input type="text" class="form-control" id="mat_sap" name="SAP_Scrap['Material']"  required="" autofocus="" value="<?php echo odbc_result($result, 'Material'); ?>" />
+                    <input type="text" class="form-control" id="mat_sap" name="SAP_Scrap['Material']"  required="" value="<?php echo odbc_result($result, 'Material'); ?>" autofocus="" />
                 </div>
 
                 <div class="form-group col-lg-5">
@@ -163,11 +163,12 @@
             <div class="form-row">
                 <div class="form-group col-lg-8"></div>
                 <div class="form-group col-lg-4" align="right">
-                    <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>&emsp;
+                    <a class="btn btn-info" href="javascript:history.back();"><i class="fa fa-window-close-o"></i> Cancel</a>
                 </div>
             </div>
         </form> 
 <?php
     $db = desconectar();
- 	include(FOOTER);
+ 	include(FOOTER_COMPLETE);
 ?>

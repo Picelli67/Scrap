@@ -10,7 +10,20 @@
 
 <?php
 	$db = conectar();
-	if($db) {
+	$sql = "SELECT SP.ID, SUBSTRING(SP.ID,1,4)+'-'+SUBSTRING(SP.ID,5,2)+'-'+SUBSTRING(SP.ID,7,2) AS Date, SP.Material, 
+			ISNULL(M.ProfitCenter, '-') As ProfitCenter , ISNULL(M.StorageLocation, '-') As StorageLocation, 
+			ISNULL(P.Program, '-') As Program, 
+			SP.Qtdy, SP.Crew, L.Line, MO.Movement, R.Reason, SP.ScrapReasonCode, ISNULL(SP.Status, '')
+			FROM SAP_Scrap SP
+			INNER JOIN Material_Master MM ON MM.Part_Number = SP.Material
+			LEFT JOIN Material M ON M.Material = MM.SAPId
+			LEFT JOIN Program P ON P.ProfitCenter = M.ProfitCenter
+			INNER JOIN Line L ON L.ID = SP.Line
+			INNER JOIN Movement MO ON MO.ID = SP.Movement
+			INNER JOIN Reason R ON R.ID = SP.Reason";
+			if($operacao <> '0')
+				$sql .= " AND SP.ID = '$operacao'";
+	$result = odbc_exec($db, $sql);
 ?>	
     <style>
       .load {
@@ -28,12 +41,10 @@
 		<h2 style="text-align:center">SAP Upload</h2>
 		<hr />
 		<div class="row">
-			<div class="col" <?php if($operacao == '0') echo 'style="display:none;"'; else echo 'style="display:block;"'; ?>>
-				<a class="btn btn-primary" href="Add.php?operacao=C"><i class="fa fa-refresh"></i> Continue</a>&emsp;
-				<a href="#" class="btn btn-success" href="#"><i class="fa fa-upload"></i> Upload SAP</a>&emsp;
-			</div>
 			<div class="col">
-				<a class="btn btn-secondary" href="../index.php"><i class="fa fa-step-backward"></i> Start</a>				
+				<a class="btn btn-primary" href="Add.php?operacao=C" <?php if($operacao == '0') echo 'style="display:none;"'; ?>><i class="fa fa-refresh"></i> Continue</a>&emsp;
+				<a class="btn btn-success" href="#" <?php if(odbc_num_rows($result) < 1 || $operacao == '0') echo 'style="display:none;"';?>><i class="fa fa-upload"></i> Upload SAP</a>&emsp;
+				<a class="btn btn-secondary" href="../index.php"><i class="fa fa-step-backward"></i> Start</a>
 			</div>
   			<div class="col">
   				<input class="form-control" type="text" name="txtPesquisa" id="txtPesquisa" placeholder="Search..." />
@@ -82,21 +93,6 @@
 		   				</thead>
 		   				<tbody id = "tabela">
 						<?php	
-						$sql = "SELECT SP.ID, SUBSTRING(SP.ID,1,4)+'-'+SUBSTRING(SP.ID,5,2)+'-'+SUBSTRING(SP.ID,7,2) AS Date, SP.Material, 
-								ISNULL(M.ProfitCenter, '-') As ProfitCenter , ISNULL(M.StorageLocation, '-') As StorageLocation, 
-								ISNULL(P.Program, '-') As Program, 
-								SP.Qtdy, SP.Crew, L.Line, MO.Movement, R.Reason, SP.ScrapReasonCode, ISNULL(SP.Status, '')
-								FROM SAP_Scrap SP
-								INNER JOIN Material_Master MM ON MM.Part_Number = SP.Material
-								LEFT JOIN Material M ON M.Material = MM.SAPId
-								LEFT JOIN Program P ON P.ProfitCenter = M.ProfitCenter
-								INNER JOIN Line L ON L.ID = SP.Line
-								INNER JOIN Movement MO ON MO.ID = SP.Movement
-								INNER JOIN Reason R ON R.ID = SP.Reason";
-						if($operacao <> '0')
-							$sql .= " AND SP.ID = '$operacao'";
-
-						$result = odbc_exec($db, $sql);
 						while (odbc_fetch_row($result)) {
 							echo '<tr>';
 							echo "<td style='width:120px'>".odbc_result($result, 'Date').'</td>';
@@ -130,7 +126,6 @@
 			</div>
 		</div>
 <?php
-  	}
     $db = desconectar();
  	include(FOOTER);
 ?>
